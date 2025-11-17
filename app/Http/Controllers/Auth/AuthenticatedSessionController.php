@@ -7,7 +7,9 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 
 
@@ -24,30 +26,41 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-        public function store(LoginRequest $request): RedirectResponse
-        {
-            $response = Http::api()->post('/users/login', [
-                'email' => $request->email,
-                'password' => $request->password,
-            ]);
-
-            if ($response->successful())
-            {
-                $data = $response->json();
-
-                $user = $data['user'];
-                //$token = $user['token'];
-                
-                session([
-                    'api_token' => $user['token'],
-                    'user_email' => $user['email'],
-                    'user_name' => $user['name'],
-                ]);
-                return redirect()->route('dashboard');
-            }
+    public function store(LoginRequest $request): RedirectResponse
+    {
+        $response = Http::api()->post('/users/login', [
+            'email' => $request->email,
+            'password' => $request->password,
+        ]);
+    
+        if ($response->successful()) {
+            $data = $response->json();
+            $apiUser = $data['user'];
+    
+            // Create or update the local user
             
-        return back()->withErrors(['email' => 'Login failed']);
+
+            $user = User::updateOrCreate(
+                ['email' => $apiUser['email']],
+                [
+                    'name' => $apiUser['name'] ?? $apiUser['email'],
+                    'password' => Hash::make('api-login')
+                ]
+            );
+            
+    
+            // Log in user in Laravel
+            Auth::login($user);
+    
+            // Store API token
+            session(['api_token' => $apiUser['token']]);
+    
+            return redirect()->route('dashboard');
         }
+    
+        return back()->withErrors(['email' => 'Login failed']);
+    }
+    
 
     /**
      * Destroy an authenticated session.

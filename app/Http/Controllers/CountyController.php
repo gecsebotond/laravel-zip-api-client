@@ -11,12 +11,74 @@ class CountyController extends Controller
     {
         $response = Http::get('http://localhost:8000/api/counties');
 
-        if ($response->successful()) {
-            $counties = $response->json('data'); // get the 'data' array
-            return view('counties.index', compact('counties'));
+        return view('counties.index', [
+            'counties' => $response->json('data') ?? []
+        ]);
+    }
+
+    public function create()
+    {
+        return view('counties.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate(['name' => 'required']);
+
+        $token = session('api_token');
+
+        $response = Http::withToken($token)->post('http://localhost:8000/api/counties', [
+            'name' => $request->name,
+        ]);
+
+        if ($response->failed()) {
+            return back()->withErrors('Failed to create county.');
         }
 
-        // fallback if API fails
-        return view('counties.index', ['counties' => []])->withErrors('Failed to fetch counties.');
+        return redirect()->route('counties.index')->with('success', 'County added!');
     }
+
+    public function edit($id)
+    {
+        $response = Http::get("http://localhost:8000/api/counties/$id");
+
+        return view('counties.edit', [
+            'county' => $response->json('data')
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate(['name' => 'required']);
+        $token = session('api_token');
+
+        $response = Http::withToken($token)->put("http://localhost:8000/api/counties/$id", [
+            'name' => $request->name,
+        ]);
+
+        if ($response->failed()) {
+            return back()->withErrors('Update failed.');
+        }
+
+        return redirect()->route('counties.index')->with('success', 'County updated!');
+    }
+
+    public function destroy($id)
+    {
+        $token = session('api_token');
+
+        $response = Http::withToken($token)->delete("http://localhost:8000/api/counties/$id");
+
+        if ($response->failed()) {
+            return back()->withErrors('Delete failed.');
+        }
+
+        return redirect()->route('counties.index')->with('success', 'County deleted!');
+    }
+
+    public function downloadXml($id)
+    {
+        return "asdadsa";
+    }
+
 }

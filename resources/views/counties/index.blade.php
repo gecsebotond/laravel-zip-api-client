@@ -2,14 +2,77 @@
 
 @section('content')
 <div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">Counties</h1>
 
-    @forelse ($counties as $county)
-        <div class="mb-6 p-4 border rounded shadow">
-            <h2 class="text-xl font-semibold">{{ $county['name'] }}</h2>
-        </div>
-    @empty
-        <p>No counties found.</p>
-    @endforelse
+    <div class="flex items-center justify-between mb-4">
+        <h1 class="text-2xl font-bold">Counties</h1>
+
+        @auth
+            <a href="{{ route('counties.create') }}"
+               class="px-4 py-2 bg-blue-600 rounded shadow hover:bg-blue-700">
+               + Add County
+            </a>
+        @endauth
+    </div>
+
+    <div class="bg-white shadow rounded overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-200 border-b">
+                    <th class="p-3 font-semibold text-gray-700">County Name</th>
+                    <th class="p-3 font-semibold text-gray-700 w-1/3">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @forelse($counties as $county)
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-3">
+                            {{ $county['name'] }}
+                        </td>
+
+                        <td class="p-3">
+                            <div class="flex flex-wrap gap-2">
+
+                                {{-- Download XML --}}
+                                <a href="{{ route('counties.downloadXml', $county['id']) }}"
+                                   class="px-3 py-1 bg-green-600 rounded shadow hover:bg-green-700">
+                                    Download XML
+                                </a>
+
+                                @auth
+
+                                    {{-- Edit --}}
+                                    <a href="{{ route('counties.edit', $county['id']) }}"
+                                       class="px-3 py-1 bg-yellow-500 rounded shadow hover:bg-yellow-600">
+                                        Edit
+                                    </a>
+
+                                    {{-- Delete --}}
+                                    <form action="{{ route('counties.destroy', $county['id']) }}" method="POST"
+                                          onsubmit="return confirm('Are you sure?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="px-3 py-1 rounded shadow">
+                                            Delete
+                                        </button>
+                                    </form>
+
+                                @endauth
+
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="2" class="p-3 text-center text-gray-500">
+                            No counties found.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
 </div>
 @endsection
