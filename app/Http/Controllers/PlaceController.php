@@ -52,21 +52,32 @@ class PlaceController extends Controller
         return redirect()->route('places.index')->with('success', 'Place added!');
     }
 
+
     public function edit($id)
     {
         $token = session('api_token');
-        $place = Http::withToken($token)->get("http://localhost:8000/api/places/$id")->json('data');
+
+        $response = Http::withToken($token)->get("http://localhost:8000/api/places/$id");
+
+        if ($response->failed()) {
+            return redirect()->route('places.index')->withErrors('Place not found.');
+        }
+
+        $place = $response->json(); // ✅ get the full JSON object
+
         $counties = Http::get('http://localhost:8000/api/counties')->json('data') ?? [];
 
         return view('places.edit', compact('place', 'counties'));
     }
+
+    
 
     public function update(Request $request, $id)
     {
         $request->validate([
             'name' => 'required',
             'postal_code' => 'required',
-            'county_id' => 'required|exists:counties,id',
+            'county_id' => 'required',
         ]);
 
         $token = session('api_token');
