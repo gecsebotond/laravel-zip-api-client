@@ -55,7 +55,7 @@ class AuthenticatedSessionController extends Controller
             // Store API token
             session(['api_token' => $apiUser['token']]);
     
-            return redirect()->route('dashboard');
+            return redirect()->route('counties.index');
         }
     
         return back()->withErrors(['email' => 'Login failed']);
@@ -67,8 +67,11 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        session()->forget('api_token');
-
-        return redirect('/');
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+    
+        return redirect('/login');
     }
+    
 }
