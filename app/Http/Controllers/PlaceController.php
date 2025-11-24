@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Http;
 
 class PlaceController extends Controller
 {
-    /**
-     * Show the Places page with county dropdown
-     */
     public function index()
     {
         $token = session('api_token');
@@ -24,7 +21,6 @@ class PlaceController extends Controller
 
     public function create()
     {
-        // Need counties for dropdown
         $counties = Http::get('http://localhost:8000/api/counties')->json('data') ?? [];
         return view('places.create', compact('counties'));
     }
@@ -34,7 +30,7 @@ class PlaceController extends Controller
         $request->validate([
             'name' => 'required',
             'postal_code' => 'required',
-            'county_id' => 'required|exists:counties,id',
+            'county_id' => 'required',
         ]);
 
         $token = session('api_token');
@@ -56,17 +52,9 @@ class PlaceController extends Controller
     public function edit($id)
     {
         $token = session('api_token');
-
         $response = Http::withToken($token)->get("http://localhost:8000/api/places/$id");
-
-        if ($response->failed()) {
-            return redirect()->route('places.index')->withErrors('Place not found.');
-        }
-
-        $place = $response->json(); // ✅ get the full JSON object
-
+        $place = $response->json();
         $counties = Http::get('http://localhost:8000/api/counties')->json('data') ?? [];
-
         return view('places.edit', compact('place', 'counties'));
     }
 
