@@ -78,7 +78,33 @@ class CountyController extends Controller
 
     public function downloadXml($id)
     {
-        return "todo";
+        $token = session('api_token');
+        $response = Http::get("http://localhost:8000/api/counties/$id");
+        $county = $response->json();
+    
+        $xmlData = new \SimpleXMLElement('<?xml version="1.0"?><county></county>');
+    
+        $this->arrayToXml($county, $xmlData);
+    
+        return response($xmlData->asXML(), 200)
+            ->header('Content-Type', 'application/xml')
+            ->header('Content-Disposition', 'attachment; filename="county_'.$id.'.xml"');
     }
-
+    
+    private function arrayToXml(array $data, \SimpleXMLElement $xmlData)
+    {
+        foreach($data as $key => $value) {
+            if(is_numeric($key)){
+                $key = 'item';
+            }
+            if(is_array($value)) {
+                $subnode = $xmlData->addChild($key);
+                $this->arrayToXml($value, $subnode);
+            } else {
+                $xmlData->addChild($key, htmlspecialchars($value));
+            }
+        }
+    }
+    
+    
 }
