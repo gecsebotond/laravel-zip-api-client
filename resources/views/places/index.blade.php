@@ -3,10 +3,27 @@
 @section('content')
 <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8" x-data="placesPage()">
 
-    @if(session('success'))
-        <div class="bg-green-200 text-green-800 p-2 rounded mb-4">
+@if(session('success'))
+        <div id="flash-message" class="bg-green-200 text-green-800 p-2 rounded mb-4 flex">
             {{ session('success') }}
+            <button id="closeButton" class="ml-auto" onClick="close">&#10006;</button>
         </div>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const flash = document.getElementById('flash-message');
+            const closeButton = document.getElementById('closeButton');
+
+            setTimeout(() => {
+                flash.remove();
+            }, 3000);
+
+            closeButton.addEventListener('click', () => {
+                flash?.remove();
+            });
+        });
+        </script>
+
     @endif
 
     @auth

@@ -6,19 +6,24 @@
     @if(session('success'))
         <div id="flash-message" class="bg-green-200 text-green-800 p-2 rounded mb-4 flex">
             {{ session('success') }}
-            <button id="closeButton" class="ml-auto" onClick="close">close</button>
+            <button id="closeButton" class="ml-auto" onClick="close">&#10006;</button>
         </div>
 
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                setTimeout(function() {
-                    const flash = document.getElementById('flash-message');
-                    if (flash) {
-                        flash.remove();
-                    }
-                }, 3000);
+        document.addEventListener('DOMContentLoaded', function() {
+            const flash = document.getElementById('flash-message');
+            const closeButton = document.getElementById('closeButton');
+
+            setTimeout(() => {
+                flash.remove();
+            }, 3000);
+
+            closeButton.addEventListener('click', () => {
+                flash?.remove();
             });
+        });
         </script>
+
     @endif
 
 
