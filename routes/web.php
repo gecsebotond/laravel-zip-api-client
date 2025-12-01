@@ -22,8 +22,8 @@ Route::get('/places', [\App\Http\Controllers\PlaceController::class, 'index'])->
 Route::get('/places/{county}/initials', function ($county) {
     $token = session('api_token');
 
-    $response = Http::withToken($token)
-        ->get("http://localhost:8000/api/counties/$county/abc");
+    $response = Http::api()->withToken($token)
+        ->get("counties/$county/abc");
 
     return $response->json();
 });
@@ -31,8 +31,8 @@ Route::get('/places/{county}/initials', function ($county) {
 Route::get('/places/{county}/initials/{letter}', function ($county, $letter) {
     $token = session('api_token');
 
-    $response = Http::withToken($token)
-        ->get("http://localhost:8000/api/counties/$county/abc/$letter");
+    $response = Http::api()->withToken($token)
+        ->get("counties/$county/abc/$letter");
 
     return $response->json();
 });

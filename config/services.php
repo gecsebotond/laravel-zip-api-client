@@ -36,6 +36,6 @@ return [
     ],
 
     'api' => [ 
-        'base_uri' => env('API_URL', 'https:api.example.com/api'), // vagy localhost http://127.0.0.1:8001/
+        'base_uri' => env('API_URL', 'https:api.example.com/api'), // http://127.0.0.1:8001/
     ],
 ];

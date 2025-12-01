@@ -12,7 +12,7 @@ class PlaceController extends Controller
     {
         $token = session('api_token');
 
-        $response = Http::withToken($token)->get('http://localhost:8000/api/counties');
+        $response = Http::api()->withToken($token)->get('counties');
 
         $counties = $response->json('data') ?? [];
 
@@ -21,7 +21,7 @@ class PlaceController extends Controller
 
     public function create()
     {
-        $counties = Http::get('http://localhost:8000/api/counties')->json('data') ?? [];
+        $counties = Http::api()->get('counties')->json('data') ?? [];
         return view('places.create', compact('counties'));
     }
 
@@ -35,7 +35,7 @@ class PlaceController extends Controller
 
         $token = session('api_token');
 
-        $response = Http::withToken($token)->post('http://localhost:8000/api/places', [
+        $response = Http::api()->withToken($token)->post('places', [
             'name' => $request->name,
             'postal_code' => $request->postal_code,
             'county_id' => $request->county_id,
@@ -52,9 +52,9 @@ class PlaceController extends Controller
     public function edit($id)
     {
         $token = session('api_token');
-        $response = Http::withToken($token)->get("http://localhost:8000/api/places/$id");
+        $response = Http::api()->withToken($token)->get("places/$id");
         $place = $response->json();
-        $counties = Http::get('http://localhost:8000/api/counties')->json('data') ?? [];
+        $counties = Http::api()->get('counties')->json('data') ?? [];
         return view('places.edit', compact('place', 'counties'));
     }
 
@@ -70,7 +70,7 @@ class PlaceController extends Controller
 
         $token = session('api_token');
 
-        $response = Http::withToken($token)->put("http://localhost:8000/api/places/$id", [
+        $response = Http::api()->withToken($token)->put("places/$id", [
             'name' => $request->name,
             'postal_code' => $request->postal_code,
             'county_id' => $request->county_id,
@@ -87,7 +87,7 @@ class PlaceController extends Controller
     {
         $token = session('api_token');
 
-        $response = Http::withToken($token)->delete("http://localhost:8000/api/places/$id");
+        $response = Http::api()->withToken($token)->delete("places/$id");
 
         if ($response->failed()) {
             return back()->withErrors('Delete failed.');

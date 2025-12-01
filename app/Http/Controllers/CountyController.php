@@ -9,7 +9,7 @@ class CountyController extends Controller
 {
     public function index()
     {
-        $response = Http::get('http://localhost:8000/api/counties');
+        $response = Http::api()->get("counties");
 
         return view('counties.index', [
             'counties' => $response->json('data') ?? []
@@ -27,7 +27,7 @@ class CountyController extends Controller
 
         $token = session('api_token');
 
-        $response = Http::withToken($token)->post('http://localhost:8000/api/counties', [
+        $response = Http::api()->withToken($token)->post('counties', [
             'name' => $request->name,
         ]);
 
@@ -40,7 +40,7 @@ class CountyController extends Controller
 
     public function edit($id)
     {
-        $response = Http::get("http://localhost:8000/api/counties/$id");
+        $response = Http::api()->get("counties/$id");
 
         return view('counties.edit', [
             'county' => $response->json('data')
@@ -52,7 +52,7 @@ class CountyController extends Controller
         $request->validate(['name' => 'required']);
         $token = session('api_token');
 
-        $response = Http::withToken($token)->put("http://localhost:8000/api/counties/$id", [
+        $response = Http::api()->withToken($token)->put("counties/$id", [
             'name' => $request->name,
         ]);
 
@@ -67,7 +67,7 @@ class CountyController extends Controller
     {
         $token = session('api_token');
 
-        $response = Http::withToken($token)->delete("http://localhost:8000/api/counties/$id");
+        $response = Http::api()->withToken($token)->delete("counties/$id");
 
         if ($response->failed()) {
             return back()->withErrors('Delete failed.');
@@ -78,7 +78,7 @@ class CountyController extends Controller
 
     public function downloadCsv($id)
     {
-        $response = Http::get("http://localhost:8000/api/counties/$id");
+        $response = Http::api()->get("counties/$id");
         $county = $response->json();
     
         if (!$county) {
