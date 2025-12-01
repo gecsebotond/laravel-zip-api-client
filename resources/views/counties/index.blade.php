@@ -3,6 +3,26 @@
 @section('content')
 <div class="container mx-auto p-4">
 
+    @if(session('success'))
+        <div id="flash-message" class="bg-green-200 text-green-800 p-2 rounded mb-4 flex">
+            {{ session('success') }}
+            <button id="closeButton" class="ml-auto" onClick="close">close</button>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    const flash = document.getElementById('flash-message');
+                    if (flash) {
+                        flash.remove();
+                    }
+                }, 3000);
+            });
+        </script>
+    @endif
+
+
+
     <div class="flex items-center justify-between mb-4">
         <h1 class="text-2xl font-bold">Counties</h1>
 
@@ -33,10 +53,10 @@
                         <td class="p-3">
                             <div class="flex flex-wrap gap-2">
 
-                                {{-- Download XML --}}
-                                <a href="{{ route('counties.downloadXml', $county['id']) }}"
+                                {{-- Download CSV --}}
+                                <a href="{{ route('counties.downloadCsv', $county['id']) }}"
                                    class="px-3 py-1 bg-green-600 rounded shadow hover:bg-green-700">
-                                    Download XML
+                                    Download CSV
                                 </a>
 
                                 @auth
@@ -48,7 +68,7 @@
                                     </a>
 
                                     {{-- Delete --}}
-                                    <form action="{{ route('counties.destroy', $county['id']) }}" method="POST"
+                                    <form action="{{ route('counties.destroy', $county['id']) }}" class = "bg-red-500 rounded shadow hover:bg-red-600" method="POST"
                                           onsubmit="return confirm('Are you sure?');">
                                         @csrf
                                         @method('DELETE')

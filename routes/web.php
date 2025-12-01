@@ -38,8 +38,8 @@ Route::get('/places/{county}/initials/{letter}', function ($county, $letter) {
 });
 
 
-Route::get('/counties/{county}/download-xml', [CountyController::class, 'downloadXml'])
-     ->name('counties.downloadXml');
+Route::get('/counties/{county}/download-csv', [CountyController::class, 'downloadCsv'])
+     ->name('counties.downloadCsv');
 
 
 Route::middleware('auth')->group(function () {

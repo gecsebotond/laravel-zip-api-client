@@ -3,7 +3,12 @@
 @section('content')
 <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8" x-data="placesPage()">
 
-    <!-- Create Place Button (auth only) -->
+    @if(session('success'))
+        <div class="bg-green-200 text-green-800 p-2 rounded mb-4">
+            {{ session('success') }}
+        </div>
+    @endif
+
     @auth
     <div class="mb-6">
         <a href="{{ route('places.create') }}" class="px-4 py-2 bg-green-500 rounded-md hover:bg-green-600">
@@ -12,7 +17,6 @@
     </div>
     @endauth
 
-    <!-- County Selector -->
     <div class="mb-6">
         <label for="county" class="block font-medium text-gray-700 mb-2">Select County</label>
         <div class="flex items-center space-x-2">
@@ -31,7 +35,6 @@
         </div>
     </div>
 
-    <!-- Initials -->
     <div class="mb-6" x-show="initials.length > 0">
         <span class="font-medium mr-2">Initials:</span>
         <template x-for="letter in initials" :key="letter">
@@ -47,7 +50,6 @@
         </template>
     </div>
 
-    <!-- Places Table -->
     <div x-show="places.length > 0" class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200 border">
             <thead class="bg-gray-50">

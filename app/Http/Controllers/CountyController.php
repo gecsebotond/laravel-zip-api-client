@@ -76,34 +76,42 @@ class CountyController extends Controller
         return redirect()->route('counties.index')->with('success', 'County deleted!');
     }
 
-    public function downloadXml($id)
+    public function downloadCsv($id)
     {
-        $token = session('api_token');
         $response = Http::get("http://localhost:8000/api/counties/$id");
         $county = $response->json();
     
-        $xmlData = new \SimpleXMLElement('<?xml version="1.0"?><county></county>');
+        if (!$county) {
+            return redirect()->back()->withErrors('County not found.');
+        }
     
-        $this->arrayToXml($county, $xmlData);
+        $csvFile = fopen('php://memory', 'w');
     
-        return response($xmlData->asXML(), 200)
-            ->header('Content-Type', 'application/xml')
-            ->header('Content-Disposition', 'attachment; filename="county_'.$id.'.xml"');
-    }
+        fputcsv($csvFile, ['county_id', 'county_name', 'place_id', 'place_name'], ";");
     
-    private function arrayToXml(array $data, \SimpleXMLElement $xmlData)
-    {
-        foreach($data as $key => $value) {
-            if(is_numeric($key)){
-                $key = 'item';
-            }
-            if(is_array($value)) {
-                $subnode = $xmlData->addChild($key);
-                $this->arrayToXml($value, $subnode);
-            } else {
-                $xmlData->addChild($key, htmlspecialchars($value));
+        $places = $county['data']['places'] ?? [];
+        //var_dump($places);
+    
+        if (empty($places)) {
+            fputcsv($csvFile, [$county['data']['id'], $county['data']['name'], '', ''], ";");
+        } else {
+            foreach ($places as $place) {
+                fputcsv($csvFile, [
+                    $county['data']['id'],
+                    $county['data']['name'],
+                    $place['id'],
+                    $place['name']
+                ], ";");
             }
         }
+    
+        rewind($csvFile);
+        $csvData = stream_get_contents($csvFile);
+        fclose($csvFile);
+    
+        return response($csvData, 200)
+            ->header('Content-Type', 'text/csv')
+            ->header('Content-Disposition', 'attachment; filename="county_'.$id.'.csv"');
     }
     
     
