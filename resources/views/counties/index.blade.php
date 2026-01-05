@@ -57,15 +57,26 @@
 
                         <td class="p-3">
                             <div class="flex flex-wrap gap-2">
+                                <div x-data="{ open: false }" class="relative inline-block text-left">
+                                    <button @click="open = !open" class="px-3 py-1 bg-green-600 rounded shadow hover:bg-green-700 text-white flex items-center gap-2">
+                                        Download
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
 
-                                {{-- Download CSV --}}
-                                <a href="{{ route('counties.downloadCsv', $county['id']) }}"
-                                   class="px-3 py-1 bg-green-600 rounded shadow hover:bg-green-700">
-                                    Download CSV
-                                </a>
+                                    <div x-show="open" @click.outside="open = false" x-transition class="absolute right-0 mt-2 w-40 bg-white rounded shadow-lg z-50">
+                                        <a href="{{ route('counties.downloadCsv', $county['id']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Download CSV
+                                        </a>
 
+                                        <a href="{{ route('counties.downloadPdf', $county['id']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Download PDF
+                                        </a>
+                                    </div>
+                                </div>
                                 @auth
-
                                     {{-- Edit --}}
                                     <a href="{{ route('counties.edit', $county['id']) }}"
                                        class="px-3 py-1 bg-yellow-500 rounded shadow hover:bg-yellow-600">
@@ -82,9 +93,7 @@
                                             Delete
                                         </button>
                                     </form>
-
                                 @endauth
-
                             </div>
                         </td>
                     </tr>

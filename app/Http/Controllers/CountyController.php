@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class CountyController extends Controller
 {
@@ -113,6 +114,23 @@ class CountyController extends Controller
             ->header('Content-Type', 'text/csv')
             ->header('Content-Disposition', 'attachment; filename="county_'.$id.'.csv"');
     }
+    public function downloadPdf($id)
+    {
+        $response = Http::api()->get("counties/$id");
+        $county = $response->json();
     
+        if (!$county) {
+            return redirect()->back()->withErrors('County not found.');
+        }
+    
+        $data = [
+            'county' => $county['data'],
+            'places' => $county['data']['places'] ?? []
+        ];
+    
+        $pdf = Pdf::loadView('pdf.countypdf', $data)->setPaper('a4', 'portrait');
+    
+        return $pdf->download('county_' . $id . '.pdf');
+    }
     
 }

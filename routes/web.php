@@ -41,6 +41,9 @@ Route::get('/places/{county}/initials/{letter}', function ($county, $letter) {
 Route::get('/counties/{county}/download-csv', [CountyController::class, 'downloadCsv'])
      ->name('counties.downloadCsv');
 
+    Route::get('/counties/{county}/download-pdf', [CountyController::class, 'downloadPdf'])
+    ->name('counties.downloadPdf');     
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
